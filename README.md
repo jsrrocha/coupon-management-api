@@ -102,4 +102,9 @@ mvn clean verify
 
 ---
 
+
+
+> 💡 **🚀 Construído para evoluir, não apenas para funcionar. Cada decisão técnica reflete o compromisso com a clareza, a testabilidade e a longevidade do software.**
+
+
 Desenvolvido com ☕ por **Jessica Salvador Rodrigues da Rocha** 🚀
