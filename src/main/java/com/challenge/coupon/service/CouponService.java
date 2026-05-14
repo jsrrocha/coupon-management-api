@@ -4,7 +4,6 @@ import com.challenge.coupon.domain.Coupon;
 import com.challenge.coupon.dto.CouponResponseDTO;
 import com.challenge.coupon.dto.CouponDTO;
 import com.challenge.coupon.entity.CouponEntity;
-import com.challenge.coupon.entity.CouponStatus;
 import com.challenge.coupon.exception.CouponNotFoundException;
 import com.challenge.coupon.mapper.CouponMapper;
 import com.challenge.coupon.repository.CouponRepository;
@@ -12,7 +11,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.UUID;
 
 @Service

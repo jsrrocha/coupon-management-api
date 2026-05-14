@@ -1,6 +1,6 @@
 # 🎟️ Coupon Management API
 
-Uma API robusta e performática para o gerenciamento de cupons de desconto, desenvolvida com **Java 21** e **Spring Boot 3.4+**.
+Uma API robusta e performática para o gerenciamento de cupons de desconto, desenvolvida com **Java 21** e **Spring Boot 3.5+**.
 
 Este projeto foi construído sob a filosofia de **Rich Domain Model** (Modelo de Domínio Rico), garantindo que a lógica de negócio esteja encapsulada e protegida, seguindo princípios de **Clean Code** e **Domain-Driven Design (DDD)**.
 
@@ -52,7 +52,6 @@ Para entender profundamente os pilares arquiteturais, padrões de projeto aplica
 ---
 
 
-
 ## 🏗️ Padrões de Projeto & Arquitetura
 
 O projeto não apenas resolve o problema técnico, mas aplica padrões de mercado para garantir manutenibilidade e escalabilidade:
@@ -74,17 +73,17 @@ O sistema garante a integridade dos cupons através de validações no construto
 
 ## 🚀 Tecnologias Utilizadas
 
-| Tecnologia | Descrição |
-| :--- | :--- |
-| **Java 21** | Uso de Records, Pattern Matching e melhorias de performance. |
-| **Spring Boot 3.4+** | Framework base para a arquitetura da API. |
-| **Spring Data JPA** | Persistência de dados com foco em produtividade. |
-| **H2 Database** | Banco de dados em memória para agilidade no desenvolvimento. |
-| **Lombok** | Redução de boilerplate (Builders com `toBuilder = true` para Records). |
-| **MapStruct** | Mapeamento eficiente entre Entidades e DTOs. |
-| **JaCoCo** | Relatórios de cobertura com Quality Gate de 80% configurado no Maven. |
-| **Swagger UI** | Documentação interativa (OpenAPI 3). |
-| **Docker** | Containerização da aplicação para garantir paridade entre ambientes. |
+| Tecnologia             | Descrição                                                              |
+|:-----------------------|:-----------------------------------------------------------------------|
+| **Java 21**            | Uso de Records  e melhorias de performance.                            |
+| **Spring Boot 3.5.14** | Framework base para a arquitetura da API.                              |
+| **Spring Data JPA**    | Persistência de dados com foco em produtividade.                       |
+| **H2 Database**        | Banco de dados em memória para agilidade no desenvolvimento.           |
+| **Lombok**             | Redução de boilerplate (Builders com `toBuilder = true` para Records). |
+| **MapStruct**          | Mapeamento eficiente entre Entidades e DTOs.                           |
+| **JaCoCo**             | Relatórios de cobertura com Quality Gate de 80% configurado no Maven.  |
+| **Swagger UI**         | Documentação interativa (OpenAPI 3).                                   |
+| **Docker**             | Containerização da aplicação para garantir paridade entre ambientes.   |
 
 
 ## 📊 Qualidade de Código (JaCoCo)
