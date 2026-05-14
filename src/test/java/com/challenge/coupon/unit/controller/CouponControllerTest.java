@@ -36,7 +36,7 @@ class CouponControllerTest {
     private ObjectMapper objectMapper;
 
     @Test
-    @DisplayName("Deve retornar 200 OK ao criar um cupom válido")
+    @DisplayName("Deve retornar 201 OK ao criar um cupom válido")
     void shouldReturnOkOnCreate() throws Exception {
         CouponDTO dto = CouponTestUtil.createValidCouponDTO();
         CouponResponseDTO response = CouponTestUtil.createValidResponseDTO(UUID.randomUUID());
@@ -44,9 +44,11 @@ class CouponControllerTest {
         when(service.create(any(CouponDTO.class))).thenReturn(response);
 
         mockMvc.perform(post("/coupon")
-                        .contentType(MediaType.APPLICATION_JSON)                        .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value(response.code()));    }
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.code").value(response.code()));
+    }
 
     @Test
     @DisplayName("Deve retornar 400 Bad Request ao enviar DTO inválido")
@@ -83,5 +85,28 @@ class CouponControllerTest {
 
         mockMvc.perform(delete("/coupon/{id}", id))
                 .andExpect(status().isNoContent());
+    }
+
+    @Test
+    @DisplayName("Deve retornar 204 No Content ao resgatar um cupom com sucesso")
+    void shouldReturnNoContentOnRedeem() throws Exception {
+        UUID id = UUID.randomUUID();
+
+        doNothing().when(service).redeem(id);
+
+        mockMvc.perform(patch("/coupon/{id}/redemption", id))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    @DisplayName("Deve retornar 404 Not Found quando tentar resgatar cupom inexistente")
+    void shouldReturnNotFoundOnRedeemNonExistent() throws Exception {
+        UUID id = UUID.randomUUID();
+
+        org.mockito.Mockito.doThrow(new com.challenge.coupon.exception.CouponNotFoundException(id))
+                .when(service).redeem(id);
+
+        mockMvc.perform(patch("/coupon/{id}/redemption", id))
+                .andExpect(status().isNotFound());
     }
 }

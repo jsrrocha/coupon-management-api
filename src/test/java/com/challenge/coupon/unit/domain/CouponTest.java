@@ -2,10 +2,7 @@ package com.challenge.coupon.unit.domain;
 
 import com.challenge.coupon.domain.Coupon;
 import com.challenge.coupon.entity.CouponStatus;
-import com.challenge.coupon.exception.CouponAlreadyDeletedException;
-import com.challenge.coupon.exception.CouponDiscountBelowMinimumException;
-import com.challenge.coupon.exception.InvalidCouponCodeException;
-import com.challenge.coupon.exception.InvalidExpirationDateException;
+import com.challenge.coupon.exception.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -76,10 +73,15 @@ class CouponTest {
 
 
     @Test
-    @DisplayName("Deve permitir exclusão se o cupom não estiver deletado")
-    void shouldAllowDeletionWhenStatusIsActive() {
+    @DisplayName("Deve realizar a deleção com sucesso e retornar nova instância com status DELETED")
+    void shouldDeleteWithSuccess() {
         Coupon coupon = createValidCoupon();
-        coupon.validateCanBeDeleted();
+
+        Coupon deletedCoupon = coupon.delete();
+
+        assertThat(deletedCoupon.getStatus()).isEqualTo(CouponStatus.DELETED);
+        assertThat(deletedCoupon.getId()).isEqualTo(coupon.getId());
+        assertThat(deletedCoupon).isNotSameAs(coupon);
     }
 
     @Test
@@ -89,8 +91,55 @@ class CouponTest {
                 .status(CouponStatus.DELETED)
                 .build();
 
-        assertThatThrownBy(toDomain(dto)::validateCanBeDeleted)
+        assertThatThrownBy(toDomain(dto)::delete)
                 .isInstanceOf(CouponAlreadyDeletedException.class);
+    }
+
+    @Test
+    @DisplayName("Deve resgatar cupom com sucesso quando ativo e dentro da validade")
+    void shouldRedeemWithSuccess() {
+        Coupon coupon = createValidCoupon();
+
+        Coupon redeemedCoupon = coupon.markAsRedeemed();
+
+        assertThat(redeemedCoupon.isRedeemed()).isTrue();
+        assertThat(redeemedCoupon).isNotSameAs(coupon);
+    }
+
+    @Test
+    @DisplayName("Deve lançar CouponNotActiveException ao resgatar cupom não ativo")
+    void shouldThrowExceptionWhenRedeemingInactiveCoupon() {
+        var dto = createValidCouponDTO().toBuilder()
+                .status(CouponStatus.INACTIVE)
+                .build();
+        Coupon coupon = toDomain(dto);
+
+        assertThatThrownBy(coupon::markAsRedeemed)
+                .isInstanceOf(CouponNotActiveException.class)
+                .hasMessageContaining("Não é possível resgatar um cupom que não esteja ativo");
+    }
+
+    @Test
+    @DisplayName("Deve lançar CouponExpiredException ao resgatar cupom com data vencida")
+    void shouldThrowExceptionWhenRedeemingExpiredCoupon() {
+        Coupon coupon = createExpiredCoupon();
+
+        assertThatThrownBy(coupon::markAsRedeemed)
+                .isInstanceOf(CouponExpiredException.class)
+                .hasMessageStartingWith("O cupom expirou em");
+    }
+
+    @Test
+    @DisplayName("Deve lançar CouponAlreadyRedeemedException ao resgatar cupom já resgatado")
+    void shouldThrowExceptionWhenAlreadyRedeemed() {
+        var dto = createValidCouponDTO().toBuilder()
+                .published(true)
+                .build();
+        Coupon coupon = toDomain(dto).toBuilder().redeemed(true).build();
+
+        assertThatThrownBy(coupon::markAsRedeemed)
+                .isInstanceOf(CouponAlreadyRedeemedException.class)
+                .hasMessageContaining("Este cupom já foi resgatado.");
     }
 
 }

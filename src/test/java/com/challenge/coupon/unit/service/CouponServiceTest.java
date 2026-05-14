@@ -5,8 +5,7 @@ import com.challenge.coupon.dto.CouponDTO;
 import com.challenge.coupon.dto.CouponResponseDTO;
 import com.challenge.coupon.entity.CouponEntity;
 import com.challenge.coupon.entity.CouponStatus;
-import com.challenge.coupon.exception.CouponAlreadyDeletedException;
-import com.challenge.coupon.exception.CouponNotFoundException;
+import com.challenge.coupon.exception.*;
 import com.challenge.coupon.mapper.CouponMapper;
 import com.challenge.coupon.repository.CouponRepository;
 import com.challenge.coupon.service.CouponService;
@@ -18,6 +17,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -129,5 +129,84 @@ class CouponServiceTest {
                 .isInstanceOf(CouponAlreadyDeletedException.class);
 
         verify(repository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("Deve executar o resgate (redeem) com sucesso")
+    void shouldRedeemSuccessfully() {
+        UUID id = UUID.randomUUID();
+        CouponEntity entity = createValidCouponEntity(); // redeemed está false
+        Coupon domain = createValidCoupon(); // Ativo e dentro da validade
+
+        when(repository.findById(id)).thenReturn(Optional.of(entity));
+        when(mapper.toDomain(entity)).thenReturn(domain);
+
+        service.redeem(id);
+
+        assertThat(entity.isRedeemed()).isTrue();
+        verify(repository).save(entity);
+    }
+
+    @Test
+    @DisplayName("Deve lançar exceção ao tentar resgatar um cupom inexistente")
+    void shouldThrowExceptionWhenRedeemingNonExistent() {
+        UUID id = UUID.randomUUID();
+        when(repository.findById(id)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.redeem(id))
+                .isInstanceOf(CouponNotFoundException.class);
+
+        verify(repository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("Deve lançar exceção ao tentar resgatar cupom vencido")
+    void shouldThrowExceptionWhenRedeemingExpired() {
+        UUID id = UUID.randomUUID();
+        CouponEntity entity = createValidCouponEntity();
+
+        Coupon expiredDomain = CouponTestUtil.createExpiredCoupon();
+
+        when(repository.findById(id)).thenReturn(Optional.of(entity));
+        when(mapper.toDomain(entity)).thenReturn(expiredDomain);
+
+        assertThatThrownBy(() -> service.redeem(id))
+                .isInstanceOf(CouponExpiredException.class);
+
+        verify(repository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("Deve lançar exceção ao tentar resgatar cupom já resgatado")
+    void shouldThrowExceptionWhenAlreadyRedeemed() {
+        UUID id = UUID.randomUUID();
+        CouponEntity entity = createValidCouponEntity();
+
+        Coupon redeemedDomain = createValidCoupon().toBuilder()
+                .redeemed(true)
+                .build();
+
+        when(repository.findById(id)).thenReturn(Optional.of(entity));
+        when(mapper.toDomain(entity)).thenReturn(redeemedDomain);
+
+        assertThatThrownBy(() -> service.redeem(id))
+                .isInstanceOf(CouponAlreadyRedeemedException.class);
+    }
+
+    @Test
+    @DisplayName("Deve lançar exceção ao tentar resgatar cupom inativo")
+    void shouldThrowExceptionWhenRedeemingInactive() {
+        UUID id = UUID.randomUUID();
+        CouponEntity entity = createValidCouponEntity();
+
+        Coupon inactiveDomain = createValidCoupon().toBuilder()
+                .status(CouponStatus.INACTIVE)
+                .build();
+
+        when(repository.findById(id)).thenReturn(Optional.of(entity));
+        when(mapper.toDomain(entity)).thenReturn(inactiveDomain);
+
+        assertThatThrownBy(() -> service.redeem(id))
+                .isInstanceOf(CouponNotActiveException.class);
     }
 }

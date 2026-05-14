@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,7 +26,7 @@ public class CouponController {
     @PostMapping
     public ResponseEntity<CouponResponseDTO> create(@RequestBody @Valid CouponDTO dto) {
         CouponResponseDTO created = service.create(dto);
-        return ResponseEntity.ok(created);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @Operation(summary = "Busca um cupom por ID")
@@ -39,6 +40,13 @@ public class CouponController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
         service.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "Resgata um cupom")
+    @PatchMapping("/{id}/redemption")
+    public ResponseEntity<Void> redeem(@PathVariable UUID id) {
+        service.redeem(id);
         return ResponseEntity.noContent().build();
     }
 }

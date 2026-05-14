@@ -39,6 +39,19 @@ public class CouponTestUtil {
         );
     }
 
+    public static Coupon createExpiredCoupon() {
+        return Coupon.builder()
+                .id(UUID.randomUUID())
+                .code("OLD123")
+                .description("Cupom Vencido")
+                .discountValue(new BigDecimal("10.0"))
+                .expirationDate(LocalDate.now().minusDays(1)) // Vencido ontem
+                .status(CouponStatus.ACTIVE)
+                .published(true)
+                .redeemed(false)
+                .build();
+    }
+
     public static CouponResponseDTO createValidResponseDTO(UUID id) {
         return new CouponResponseDTO(
                 id,

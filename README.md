@@ -1,10 +1,76 @@
 # 🎟️ Coupon Management API
 
-Uma API robusta e performática para o gerenciamento de cupons de desconto, desenvolvida com **Java 21** e **Spring Boot 3**.
-Este projeto foi construído seguindo os princípios de Clean Code,
-Domain-Driven Design (DDD) e alta cobertura de testes automatizados.
+Uma API robusta e performática para o gerenciamento de cupons de desconto, desenvolvida com **Java 21** e **Spring Boot 3.4+**.
+
+Este projeto foi construído sob a filosofia de **Rich Domain Model** (Modelo de Domínio Rico), garantindo que a lógica de negócio esteja encapsulada e protegida, seguindo princípios de **Clean Code** e **Domain-Driven Design (DDD)**.
+
+
+## 🛠️ Como Executar o Projeto
+
+Você pode rodar a aplicação localmente com Maven ou via Docker.
+
+### Opção 1: Maven
+
+1. **Clone o repositório**:
+    ```bash
+    git clone https://github.com/jsrrocha/coupon-management-api.git
+    ```
+
+2. **Entre na pasta:**:
+   ```bash
+   cd coupon-management-api
+   ```
+
+3. **rode a aplicação**:
+   ```bash
+   mvn spring-boot:run
+   ```
+
+4. **Certifique-se de estar usando o JDK 21**
+
+### Opção 2: Docker (Recomendado)
+
+1. **Construa e suba o container:**:
+
+   ```bash
+   docker build -t coupon-api .
+   docker run -p 8080:8080 coupon-api
+   ```
+
+#### Acesse a documentação Swagger para testar os endpoints:
+👉 [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
 
 ---
+
+## 📖 Documentação de Decisões Técnicas (Wiki)
+
+Para entender profundamente os pilares arquiteturais, padrões de projeto aplicados e as motivações por trás de cada escolha técnica, acesse a documentação completa:
+
+👉 **[Acesse a Wiki de Decisões Técnicas](https://github.com/jsrrocha/coupon-management-api)**
+
+
+---
+
+
+
+## 🏗️ Padrões de Projeto & Arquitetura
+
+O projeto não apenas resolve o problema técnico, mas aplica padrões de mercado para garantir manutenibilidade e escalabilidade:
+
+* **Rich Domain Model:** Domínio autossuficiente que valida seu próprio estado.
+* **Static Factory Methods:** Semântica clara na criação e recuperação de objetos.
+* **Object Mother Pattern:** Centralização de massas de dados para testes unitários limpos e resilientes.
+* **Strategy & Fail-Fast:** Validações sintáticas no DTO (Bean Validation) e semânticas no Domínio.
+* **Global Exception Handling (RFC 7807):** Padronização de erros para facilitar o consumo da API.
+
+
+## 🛡️ Regras de Domínio e Validações
+
+O sistema garante a integridade dos cupons através de validações no construtor do domínio:
+- ✅ **Código**: Exatamente 6 caracteres alfanuméricos.
+- ✅ **Desconto Mínimo**: Valor base de **0.5**.
+- ✅ **Validade**: Bloqueio de datas de expiração anteriores ao dia atual.
+- ✅ **Estado**: Implementação de *Soft Delete* (status `DELETED`) para histórico.
 
 ## 🚀 Tecnologias Utilizadas
 
@@ -19,33 +85,11 @@ Domain-Driven Design (DDD) e alta cobertura de testes automatizados.
 | **JaCoCo** | Relatórios de cobertura com Quality Gate de 80% configurado no Maven. |
 | **Swagger UI** | Documentação interativa (OpenAPI 3). |
 | **Docker** | Containerização da aplicação para garantir paridade entre ambientes. |
----
 
-## 🏗️ Estrutura do Projeto
-
-A arquitetura foi desenhada para separar claramente as regras de negócio da infraestrutura:
-
-- **`domain`**: Modelos ricos com validações de estado e regras de negócio.
-- **`service`**: Orquestração de fluxos e integração com repositórios.
-- **`controller`**: Camada de exposição REST com tratamento global de exceções.
-- **`dto` & `mapper`**: Separação total entre os contratos da API e as tabelas do banco.
-- **`util` (Testes)**: Centralização de criação de objetos (Object Mother) para testes limpos.
-
----
-
-## 🛡️ Regras de Domínio e Validações
-
-O sistema garante a integridade dos cupons através de validações no construtor do domínio:
-- ✅ **Código**: Exatamente 6 caracteres alfanuméricos.
-- ✅ **Desconto Mínimo**: Valor base de **0.5**.
-- ✅ **Validade**: Bloqueio de datas de expiração anteriores ao dia atual.
-- ✅ **Estado**: Implementação de *Soft Delete* (status `DELETED`) para histórico.
-
----
 
 ## 📊 Qualidade de Código (JaCoCo)
 
-O projeto utiliza o **JaCoCo** integrado ao ciclo de vida do Maven. 
+O projeto utiliza o **JaCoCo** integrado ao ciclo de vida do Maven.
 O build só será finalizado com sucesso se a cobertura de testes de linha atingir o mínimo de **80%**.
 
 ### Como rodar os testes e gerar o relatório:
@@ -53,45 +97,10 @@ O build só será finalizado com sucesso se a cobertura de testes de linha ating
 mvn clean verify
 ```
 
-# O relatório detalhado será gerado em:
-### target/site/jacoco/index.html
+### 📄 Localização do Relatório
 
----
-## 🛠️ Como Executar o Projeto
-
-Você pode rodar a aplicação localmente com Maven ou via Docker.
-
-### Opção 1: Maven
-1. **Instale as dependências e rode a aplicação**:
-   ```bash
-   mvn spring-boot:run
-   ```
-
-2. **Clone o repositório**:
-    ```bash
-    git clone https://github.com/seu-usuario/coupon-management-api.git
-    ```
-3. **Certifique-se de estar usando o JDK 21**.
-4. **Instale as dependências e rode a aplicação**:
-    ```bash
-    mvn spring-boot:run
-    ```
-
-### Opção 2: Docker (Recomendado)
-
-1. **Construa a imagem**:
-   ```bash
-   docker build -t coupon-api .
-   ```
-
-2**Suba o container:**:
-   ```bash
-   docker run -p 8080:8080 coupon-api
-   ```
-
-**Acesse a documentação Swagger** para testar os endpoints:
-http://localhost:8080/swagger-ui.html
+`target/site/jacoco/index.html`
 
 ---
 
-Desenvolvido por **Jessica Salvador Rodrigues da Rocha** 🚀 
+Desenvolvido com ☕ por **Jessica Salvador Rodrigues da Rocha** 🚀

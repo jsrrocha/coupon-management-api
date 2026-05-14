@@ -12,6 +12,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Service
@@ -48,9 +49,21 @@ public class CouponService {
                 .orElseThrow(() -> new CouponNotFoundException(id));
 
         Coupon domain = mapper.toDomain(entity);
-        domain.validateCanBeDeleted();
+        Coupon deletedDomain = domain.delete();
 
-        entity.setStatus(CouponStatus.DELETED);
+        entity.setStatus(deletedDomain.getStatus());
+        repository.save(entity);
+    }
+
+    @Transactional
+    public void redeem(UUID id) {
+        CouponEntity entity = repository.findById(id)
+                .orElseThrow(() -> new CouponNotFoundException(id));
+
+        Coupon domain = mapper.toDomain(entity);
+        Coupon redeemedDomain = domain.markAsRedeemed();
+
+        entity.setRedeemed(redeemedDomain.isRedeemed());
         repository.save(entity);
     }
 

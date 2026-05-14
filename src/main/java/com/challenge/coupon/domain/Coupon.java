@@ -1,10 +1,7 @@
 package com.challenge.coupon.domain;
 
 import com.challenge.coupon.entity.CouponStatus;
-import com.challenge.coupon.exception.CouponAlreadyDeletedException;
-import com.challenge.coupon.exception.CouponDiscountBelowMinimumException;
-import com.challenge.coupon.exception.InvalidCouponCodeException;
-import com.challenge.coupon.exception.InvalidExpirationDateException;
+import com.challenge.coupon.exception.*;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -50,10 +47,24 @@ public class Coupon {
         );
     }
 
-    public void validateCanBeDeleted() {
+    public Coupon delete() {
         if (this.status == CouponStatus.DELETED) {
             throw new CouponAlreadyDeletedException(this.id);
         }
+        return this.toBuilder().status(CouponStatus.DELETED).build();
+    }
+
+    public Coupon markAsRedeemed() {
+        if (this.status != CouponStatus.ACTIVE) {
+            throw new CouponNotActiveException("Não é possível resgatar um cupom que não esteja ativo");
+        }
+        if (this.expirationDate.isBefore(LocalDate.now())) {
+            throw new CouponExpiredException("O cupom expirou em " + this.expirationDate);
+        }
+        if (this.redeemed) {
+            throw new CouponAlreadyRedeemedException("Este cupom já foi resgatado.");
+        }
+        return this.toBuilder().redeemed(true).build();
     }
 
     private static String ensureSixCharacters(String rawCode) {
@@ -73,5 +84,7 @@ public class Coupon {
             throw new InvalidExpirationDateException("A data de expiração não pode ser anterior à data atual.");        }
         return date;
     }
+
+
 
 }
